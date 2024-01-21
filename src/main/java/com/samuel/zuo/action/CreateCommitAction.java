@@ -19,6 +19,7 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.ui.Refreshable;
 import com.intellij.vcs.commit.AbstractCommitWorkflowHandler;
+import com.samuel.zuo.setting.CommitByAISettingsState;
 import okhttp3.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -142,9 +143,9 @@ public class CreateCommitAction extends AnAction implements DumbAware {
             List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(relativePath, relativePath, original, patch, 3);
             totalUnifiedDiffs.addAll(unifiedDiff);
         }
-        return "Summarize the changes simply and clearly in Chinese. The following is changes in unified view:\n" +
-                String.join("\n", totalUnifiedDiffs) + "\n"
-                + "the summary is formatted as list, like: \n1..;\n2..;";
+        String prompt = new String(CommitByAISettingsState.getInstance().prompt);
+        prompt = prompt.replace("${UnifiedDiff}", String.join("\n", totalUnifiedDiffs));
+        return prompt;
     }
 
     private String parseExistingCommitMessage(CommitMessageI commitPanel) {

@@ -25,12 +25,18 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.samuel.zuo.setting.CommitByAIConfigurable"
+                id="com.samuel.zuo.setting.CommitByAIConfigurable"
+                displayName="Commit By AI"/>
+        <applicationService serviceImplementation="com.samuel.zuo.setting.CommitByAISettingsState"/>
     </extensions>
     <actions>
         <action id="Commit.Button" class="com.samuel.zuo.action.CreateCommitAction"
-                text="Create commit message"
-                description="Create commit message"
-                icon="/icons/load.png">
+                text="Commit By AI"
+                description="Commit By AI"
+                icon="/icons/pen-grey.png">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
         </action>
     </actions>
