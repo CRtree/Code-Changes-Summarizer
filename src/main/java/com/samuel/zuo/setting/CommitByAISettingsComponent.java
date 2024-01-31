@@ -21,9 +21,16 @@ public class CommitByAISettingsComponent {
     private JTextField aiServerAddressTextField = new JTextField();
 
     public CommitByAISettingsComponent() {
-        modelComboBox.addItem("mistral-7B");
-        JBTextArea tipsTextArea = new JBTextArea("1. Please input the prompt in English.\n" +
-                "2. ${UnifiedDiff} can't be removed from prompt, it's a placeholder that represents\n changed files.");
+        modelComboBox.addItem("mistral");
+//        modelComboBox.addItem("codellama:7b");
+        JBTextArea tipsTextArea = new JBTextArea(
+                """
+                1. This plugin is based on the mistra-7B model running on local mechine.
+                2. Download Ollama and setup mistral-7B model(https://ollama.ai/library/mistral).
+                3. ${UnifiedDiff} is a placeholder that represents changed files, do not delete it.
+                4. You can update the prompt as you like.
+                """
+        );
         tipsTextArea.setEditable(false);
         tipsTextArea.setOpaque(false);
         // Set the font to bold
@@ -33,7 +40,7 @@ public class CommitByAISettingsComponent {
                 .addLabeledComponent(new JBLabel("Model: "), modelComboBox, 1, false)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel("Prompt: "), promptTextArea, 1, false)
-                .addVerticalGap(5)
+                .addVerticalGap(10)
                 .addLabeledComponent(new JBLabel("Tips: "), tipsTextArea, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
@@ -47,8 +54,16 @@ public class CommitByAISettingsComponent {
         return promptTextArea.getText();
     }
 
+    public String getModel() {
+        return modelComboBox.getSelectedItem().toString();
+    }
+
     public void setPrompt(String prompt) {
         promptTextArea.setText(prompt);
+    }
+
+    public void setModel(String model) {
+        modelComboBox.setSelectedItem(model);
     }
 
     public String getAiServerAddress() {

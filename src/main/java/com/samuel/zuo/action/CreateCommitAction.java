@@ -11,7 +11,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.CheckinProjectPanel;
 import com.intellij.openapi.vcs.CommitMessageI;
 import com.intellij.openapi.vcs.VcsDataKeys;
 import com.intellij.openapi.vcs.VcsException;
@@ -20,7 +19,9 @@ import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.ui.Refreshable;
 import com.intellij.vcs.commit.AbstractCommitWorkflowHandler;
 import com.samuel.zuo.setting.CommitByAISettingsState;
+import icons.MyIcons;
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
@@ -37,17 +38,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class CreateCommitAction extends AnAction implements DumbAware {
 
+    private static boolean aiProcessing = false;
+
     @Override
     public void actionPerformed(AnActionEvent event) {
         System.out.println("CreateCommitAction actionPerformed");
         CommitMessageI commitPanel = getCommitPanel(event);
-//        if (commitPanel == null) return;
-//        String existMessage = parseExistingCommitMessage(commitPanel);
-//        CustomCommitTemplateDialog dialog = new CustomCommitTemplateDialog(existMessage);
-//        dialog.show();
-//        if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-//            commitPanel.setCommitMessage(dialog.getCommitMessage());
-//        }
+        aiProcessing = true;
         handleChangedFiles(event, commitPanel);
     }
 
@@ -72,7 +69,8 @@ public class CreateCommitAction extends AnAction implements DumbAware {
                 .build();
         // 请求体数据
         JsonObject bodyJson = new JsonObject();
-        bodyJson.addProperty("model", "mistral");
+        String model = CommitByAISettingsState.getInstance().model;
+        bodyJson.addProperty("model", model);
         bodyJson.addProperty("prompt", prompt);
         // 创建请求体
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), bodyJson.toString());
@@ -107,7 +105,9 @@ public class CreateCommitAction extends AnAction implements DumbAware {
                         System.out.print(message);
                         sb.append(message);
                         String freshMessage = sb.toString();
-                        ApplicationManager.getApplication().invokeLater(() -> commitPanel.setCommitMessage(freshMessage));
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            commitPanel.setCommitMessage(freshMessage);
+                        });
                     }
                 }
             } else {
@@ -118,6 +118,7 @@ public class CreateCommitAction extends AnAction implements DumbAware {
             // 处理异常
             e.printStackTrace();
         }
+        aiProcessing = false;
     }
 
     private String buildPrompt(List<Change> includedChanges, String baseDir) {
@@ -148,15 +149,6 @@ public class CreateCommitAction extends AnAction implements DumbAware {
         return prompt;
     }
 
-    private String parseExistingCommitMessage(CommitMessageI commitPanel) {
-        if (commitPanel instanceof CheckinProjectPanel) {
-            String commitMessageString = ((CheckinProjectPanel) commitPanel).getCommitMessage();
-            return commitMessageString;
-        }
-        return null;
-    }
-
-
     @Nullable
     private static CommitMessageI getCommitPanel(@Nullable AnActionEvent e) {
         if (e == null) {
@@ -167,5 +159,19 @@ public class CreateCommitAction extends AnAction implements DumbAware {
             return (CommitMessageI) data;
         }
         return VcsDataKeys.COMMIT_MESSAGE_CONTROL.getData(e.getDataContext());
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        super.update(e);
+        //e.getPresentation().setEnabled(!aiProcessing);
+        if (aiProcessing) {
+            e.getPresentation().setIcon(MyIcons.loading);
+            e.getPresentation().setEnabled(false);
+        }else{
+            e.getPresentation().setIcon(MyIcons.penGrey);
+            e.getPresentation().setEnabled(true);
+        }
+
     }
 }

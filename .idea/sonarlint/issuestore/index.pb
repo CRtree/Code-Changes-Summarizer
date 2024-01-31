@@ -16,9 +16,7 @@ P
 build.gradle.kts,d/b/dbcff70658daf80b53ce624f6adcaa529df5ed8d
 C
 settings.gradle.kts,7/4/749edfcc96398253e5b3416184e95c46621da850
-n
->src/main/java/com/samuel/zuo/listener/ProjectOpenListener.java,d/3/d3ef5c7bf62af20fe79dce6f47245c6b25ad3fb9
-m
-=src/main/java/com/samuel/zuo/listener/ToolwindowListener.java,1/0/103bffacedb35b43fcad1f6a728f1f4a5484f120
 g
 7src/main/java/com/samuel/zuo/markdown/MarkdownUtil.java,e/f/ef3d9f1b8a95e0f4dd458074c05878e650802a44
+s
+Csrc/main/java/com/samuel/zuo/action/CustomCommitTemplateDialog.java,8/6/86ef1790945ee9217bff05adfaef30c30a2ccfdb

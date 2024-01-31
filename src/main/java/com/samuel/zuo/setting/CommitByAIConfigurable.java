@@ -31,19 +31,21 @@ public class CommitByAIConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         CommitByAISettingsState settingsState = CommitByAISettingsState.getInstance();
-        return !commitByAISettingsComponent.getPrompt().equals(settingsState.prompt);
+        return !commitByAISettingsComponent.getPrompt().equals(settingsState.prompt) ||
+                !commitByAISettingsComponent.getModel().equals(settingsState.model);
     }
 
     @Override
     public void apply() {
         CommitByAISettingsState settingsState = CommitByAISettingsState.getInstance();
         settingsState.prompt = commitByAISettingsComponent.getPrompt();
-        System.out.println("apply:" + settingsState.prompt);
+        settingsState.model = commitByAISettingsComponent.getModel();
     }
 
     @Override
     public void reset() {
         commitByAISettingsComponent.setPrompt(CommitByAISettingsState.getInstance().prompt);
+        commitByAISettingsComponent.setModel(CommitByAISettingsState.getInstance().model);
         //settingsForm.setAiServerAddress(settingsState.aiServerAddress);
     }
 

@@ -29,21 +29,15 @@
                 parentId="tools"
                 instance="com.samuel.zuo.setting.CommitByAIConfigurable"
                 id="com.samuel.zuo.setting.CommitByAIConfigurable"
-                displayName="Commit By AI"/>
+                displayName="Summarize Code Changes"/>
         <applicationService serviceImplementation="com.samuel.zuo.setting.CommitByAISettingsState"/>
     </extensions>
     <actions>
         <action id="Commit.Button" class="com.samuel.zuo.action.CreateCommitAction"
-                text="Commit By AI"
-                description="Commit By AI"
-                icon="/icons/pen-grey.png">
+                text="Summarize Code Changes"
+                description="Summarize code changes"
+                icon="MyIcons.penGrey">
             <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
         </action>
     </actions>
-    <projectListeners>
-<!--        <listener class="com.samuel.zuo.listener.ProjectOpenListener"-->
-<!--                  topic="com.intellij.openapi.project.ProjectManagerListener"/>-->
-        <listener class="com.samuel.zuo.listener.ToolwindowListener"
-                  topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
-    </projectListeners>
 </idea-plugin>

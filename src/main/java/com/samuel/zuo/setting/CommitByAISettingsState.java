@@ -26,6 +26,8 @@ public class CommitByAISettingsState implements PersistentStateComponent<CommitB
             """;
     private String aiServerAddress = "";
 
+    public String model = "mistral";
+
     @Override
     public CommitByAISettingsState getState() {
         return this;
