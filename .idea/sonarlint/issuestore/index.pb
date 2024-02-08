@@ -1,6 +1,4 @@
 
-A
-gradle.properties,2/a/2afbb999f001938c88fa43fc2ef52abf0f8213e4
 X
 (gradle/wrapper/gradle-wrapper.properties,f/b/fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
 7
@@ -12,11 +10,5 @@ X
 gradlew.bat,2/a/2a45a911a8f1836b0b6c5b758962572012d8f8c3
 P
  .run/Run IDE with Plugin.run.xml,5/4/54d71bf2961490156433b7d04757bbc12414e5e4
-@
-build.gradle.kts,d/b/dbcff70658daf80b53ce624f6adcaa529df5ed8d
-C
-settings.gradle.kts,7/4/749edfcc96398253e5b3416184e95c46621da850
-g
-7src/main/java/com/samuel/zuo/markdown/MarkdownUtil.java,e/f/ef3d9f1b8a95e0f4dd458074c05878e650802a44
-s
-Csrc/main/java/com/samuel/zuo/action/CustomCommitTemplateDialog.java,8/6/86ef1790945ee9217bff05adfaef30c30a2ccfdb
+P
+ src/main/java/icons/MyIcons.java,0/b/0b64c9d30100a7006d71b83dba5767265a6e0c49

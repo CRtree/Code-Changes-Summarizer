@@ -4,9 +4,10 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.FormBuilder;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UI;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * description: MyPluginSettingsForm
@@ -22,26 +23,18 @@ public class CommitByAISettingsComponent {
 
     public CommitByAISettingsComponent() {
         modelComboBox.addItem("mistral");
-//        modelComboBox.addItem("codellama:7b");
-        JBTextArea tipsTextArea = new JBTextArea(
-                """
-                1. This plugin is based on the mistra-7B model running on local mechine.
-                2. Download Ollama and setup mistral-7B model(https://ollama.ai/library/mistral).
-                3. ${UnifiedDiff} is a placeholder that represents changed files, do not delete it.
-                4. You can update the prompt as you like.
-                """
-        );
-        tipsTextArea.setEditable(false);
-        tipsTextArea.setOpaque(false);
-        // Set the font to bold
-        Font boldFont = tipsTextArea.getFont().deriveFont(Font.BOLD);
-        tipsTextArea.setFont(boldFont);
+        promptTextArea.setMargin(JBUI.insets(5));
+        JPanel panel2 = UI.PanelFactory.panel(promptTextArea).
+                withComment("<p>Plugin is based on Ollama(and mistra-7B model) API running on local machine. Please download" +
+                        " <a href=\"https://ollama.ai/\">Ollama</a> and <a href=\"https://ollama.ai/library/mistral\">mistra</a> model firstly.</p>")
+                .createPanel();
         panel = FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("Model: "), modelComboBox, 1, false)
+//                .addLabeledComponent(new JBLabel("Model: "), modelComboBox, 1, false)
+//                .addVerticalGap(5)
+                .addComponent(new JBLabel("Prompt text:"))
                 .addVerticalGap(5)
-                .addLabeledComponent(new JBLabel("Prompt: "), promptTextArea, 1, false)
+                .addComponent(panel2)
                 .addVerticalGap(10)
-                .addLabeledComponent(new JBLabel("Tips: "), tipsTextArea, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
