@@ -43,9 +43,9 @@ tasks {
     }
 
     signPlugin {
-        certificateChainFile.set(file("Users/samuel_zuo/.ssh/chain.crt"))
-        privateKeyFile.set(file("Users/samuel_zuo/.ssh/private.pem"))
-        password.set("qazw")
+        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
+        privateKey.set(System.getenv("PRIVATE_KEY"))
+        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
     }
 
     publishPlugin {
