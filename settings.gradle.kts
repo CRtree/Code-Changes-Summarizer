@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "plugin-demo1"
+rootProject.name = "summarize-code-changes"

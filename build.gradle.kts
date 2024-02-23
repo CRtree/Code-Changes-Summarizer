@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.samuel.zuo"
-version = "1.0-SNAPSHOT"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
@@ -43,9 +43,9 @@ tasks {
     }
 
     signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+        certificateChainFile.set(file("Users/samuel_zuo/.ssh/chain.crt"))
+        privateKeyFile.set(file("Users/samuel_zuo/.ssh/private.pem"))
+        password.set("qazw")
     }
 
     publishPlugin {

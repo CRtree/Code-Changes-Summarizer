@@ -1,21 +1,24 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>com.samuel.zuo.plugin-demo1</id>
+    <id>com.samuel.zuo.summarize-code-changes</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>demo1</name>
+    <name>Code Changes Summarizer</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="samuel@yourcompany.com" url="https://www.yourcompany.com">samuel</vendor>
+    <vendor email="zuoxiao15651900760@gmail.com">samuel zuo</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    popupsdawswdwesafdaesrtgsdrghfhjfgkumhikojhkhjghgjjjjjj.<br>
-    <em>dsa/em>
+        The Code Changes Summarizer plugin helps developers summarize their code changes effortlessly. Leveraging the powerful Ollama and Mistra-7B models, this plugin provides comprehensive summaries of your code modifications directly within IntelliJ IDEA.
+        * To utilize this plugin, ensure you have installed Ollama and Mistra on your local machine. These tools are integral to the functionality of the plugin and provide advanced natural language processing capabilities for accurate and concise summaries.
+        * Simply select the code changes you wish to summarize, and with a few clicks, obtain insightful summaries to better understand and communicate your modifications.
+        * You can update the prompt in the settings: Tools -> Summarize Code Changes
+        Note: Prior to using this plugin, download and set up Ollama and Mistra on your machine for seamless integration.
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.
