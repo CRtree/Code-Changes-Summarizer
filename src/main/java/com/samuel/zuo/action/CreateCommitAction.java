@@ -6,6 +6,9 @@ import com.github.difflib.patch.Patch;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -84,6 +87,7 @@ public class CreateCommitAction extends AnAction implements DumbAware {
                 .build();
         StringBuilder sb = new StringBuilder();
         // 发起请求并处理响应
+        boolean apiSuccess = false;
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 ResponseBody body = response.body();
@@ -113,16 +117,23 @@ public class CreateCommitAction extends AnAction implements DumbAware {
                         });
                     }
                 }
+                apiSuccess = true;
             } else {
                 // 处理失败响应
-                System.out.println("Unexpected response code: " + response.code());
-                System.out.println(response.body().string());
+                System.out.println("api response code: " + response.code());
+                System.out.println(response.body());
             }
         } catch (Exception e) {
             // 处理异常
             e.printStackTrace();
+        } finally {
+            aiProcessing = false;
+            if (!apiSuccess) {
+                Notifications.Bus.notify(new Notification("Summarize Code Changes",
+                        "Summarize changes failed",
+                        "Please check if Ollama is running well on your local machine.", NotificationType.ERROR));
+            }
         }
-        aiProcessing = false;
     }
 
     private String buildPrompt(List<Change> includedChanges, String baseDir) {

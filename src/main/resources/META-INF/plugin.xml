@@ -20,6 +20,15 @@
         <p>* You can update the prompt in the settings: Tools -> Summarize Code Changes</p>
   ]]></description>
 
+    <change-notes><![CDATA[
+        <h2>New Features</h2>
+        <ul>
+          <li>support more model(codellama,llama2...)</li>
+          <li>add new parameters in settings: Tools -> Summarize Code Changes</li>
+          <li>notification when the Ollama or model is not ready</li>
+        </ul>
+]]></change-notes>
+
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
@@ -33,6 +42,7 @@
                 id="com.samuel.zuo.setting.CommitByAIConfigurable"
                 displayName="Summarize Code Changes"/>
         <applicationService serviceImplementation="com.samuel.zuo.setting.CommitByAISettingsState"/>
+        <notificationGroup id="Summarize Code Changes" displayType="BALLOON"/>
     </extensions>
     <actions>
         <action id="Commit.Button" class="com.samuel.zuo.action.CreateCommitAction"
