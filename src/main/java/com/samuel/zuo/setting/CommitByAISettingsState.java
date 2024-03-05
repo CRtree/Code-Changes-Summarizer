@@ -18,11 +18,16 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 )
 public class CommitByAISettingsState implements PersistentStateComponent<CommitByAISettingsState> {
     public String prompt = """
-            Summarize the changes simply and clearly in Chinese. The following is changes in unified view:
+            It is the code changes in unified view, changed file num is ${TotalFileCount}:
             ${UnifiedDiff}
-            the summary is formatted as list, like:\s
-            1..;
-            2..;
+            Please generate commit message with template:
+                        
+            [Feature/Bugfix]: A brief summary of the changes in this commit (max. 50 characters)
+                        
+            Detailed description of the changes:
+            - Description of change #1 (max. 72 characters per line, no period at the end)
+            - Description of change #2 (max. 72 characters per line, no period at the end)
+            - ... and so on for as many changes as necessary
             """;
     private String aiServerAddress = "";
 

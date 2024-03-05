@@ -72,6 +72,9 @@ public class CreateCommitAction extends AnAction implements DumbAware {
         String model = CommitByAISettingsState.getInstance().model;
         bodyJson.addProperty("model", model);
         bodyJson.addProperty("prompt", prompt);
+//        JsonObject options = new JsonObject();
+//        options.addProperty("temperature", 0.8);
+//        bodyJson.add("options", options);
         // 创建请求体
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), bodyJson.toString());
         // 创建请求
@@ -113,6 +116,7 @@ public class CreateCommitAction extends AnAction implements DumbAware {
             } else {
                 // 处理失败响应
                 System.out.println("Unexpected response code: " + response.code());
+                System.out.println(response.body().string());
             }
         } catch (Exception e) {
             // 处理异常
@@ -146,6 +150,7 @@ public class CreateCommitAction extends AnAction implements DumbAware {
         }
         String prompt = new String(CommitByAISettingsState.getInstance().prompt);
         prompt = prompt.replace("${UnifiedDiff}", String.join("\n", totalUnifiedDiffs));
+        prompt = prompt.replace("${TotalFileCount}", String.valueOf(includedChanges.size()));
         return prompt;
     }
 

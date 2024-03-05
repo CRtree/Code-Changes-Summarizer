@@ -23,14 +23,21 @@ public class CommitByAISettingsComponent {
 
     public CommitByAISettingsComponent() {
         modelComboBox.addItem("mistral");
+        modelComboBox.addItem("codellama:7b");
+        modelComboBox.addItem("codellama");
+        modelComboBox.addItem("llama2:7b");
         promptTextArea.setMargin(JBUI.insets(5));
         JPanel panel2 = UI.PanelFactory.panel(promptTextArea).
-                withComment("<p>Plugin is based on Ollama(and mistra-7B model) API running on local machine. Please download" +
-                        " <a href=\"https://ollama.ai/\">Ollama</a> and <a href=\"https://ollama.ai/library/mistral\">mistra</a> model firstly.</p>")
+                withComment("<p>Plugin is based on Ollama API running on local machine. Please download" +
+                        " <a href=\"https://ollama.ai/\">Ollama</a> firstly.</p>"+
+                        "<br/>" +
+                        "<p> Parameters can be used in prompt: </p> "+
+                        "<p> ${TotalFileCount}: number of changed files</p>"+
+                        "<p> ${UnifiedDiff}: changed code by git unified view</p>")
                 .createPanel();
         panel = FormBuilder.createFormBuilder()
-//                .addLabeledComponent(new JBLabel("Model: "), modelComboBox, 1, false)
-//                .addVerticalGap(5)
+                .addLabeledComponent(new JBLabel("Model: "), modelComboBox, 1, false)
+                .addVerticalGap(5)
                 .addComponent(new JBLabel("Prompt text:"))
                 .addVerticalGap(5)
                 .addComponent(panel2)
