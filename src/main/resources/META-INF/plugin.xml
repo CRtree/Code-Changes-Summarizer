@@ -23,9 +23,7 @@
     <change-notes><![CDATA[
         <h2>New Features</h2>
         <ul>
-          <li>support more model(codellama,llama2...)</li>
-          <li>add new parameters in settings: Tools -> Summarize Code Changes</li>
-          <li>notification when the Ollama or model is not ready</li>
+          <li>add 'llama3' model option(still need to download it in Ollama firstly)</li>
         </ul>
 ]]></change-notes>
 

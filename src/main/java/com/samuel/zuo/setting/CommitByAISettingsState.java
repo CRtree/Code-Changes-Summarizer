@@ -18,11 +18,11 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 )
 public class CommitByAISettingsState implements PersistentStateComponent<CommitByAISettingsState> {
     public String prompt = """
-            It is the code changes in unified view, changed file num is ${TotalFileCount}:
+            It is the code changes gives by unified view, changed file num is ${TotalFileCount}:
             ${UnifiedDiff}
             Please generate commit message with template:
                         
-            [Feature/Bugfix]: A brief summary of the changes in this commit (max. 50 characters)
+            [Feature/Bugfix]: A brief summary of the changes in this commit (max 50 characters)
                         
             Detailed description of the changes:
             - Description of change #1 (max. 72 characters per line, no period at the end)
