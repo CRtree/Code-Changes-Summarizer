@@ -27,6 +27,7 @@ public class CommitByAISettingsComponent {
         modelComboBox.addItem("codellama");
         modelComboBox.addItem("llama2:7b");
         modelComboBox.addItem("llama3");
+        modelComboBox.addItem("llama3.1:8b");
         promptTextArea.setMargin(JBUI.insets(5));
         JPanel panel2 = UI.PanelFactory.panel(promptTextArea).
                 withComment("<p>Plugin is based on Ollama API running on local machine. Please download" +
