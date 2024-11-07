@@ -20,7 +20,13 @@ import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.ui.Refreshable;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.JavaRecursiveElementVisitor;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMethod;
 import com.intellij.vcs.commit.AbstractCommitWorkflowHandler;
+import com.samuel.zuo.service.JavaCodeContextExtractor;
 import com.samuel.zuo.setting.CommitByAISettingsState;
 import icons.MyIcons;
 import okhttp3.*;
@@ -28,9 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,7 +65,7 @@ public class CreateCommitAction extends AnAction implements DumbAware {
         }
         List<Change> includedChanges = abstractCommitWorkflowHandler.getUi().getIncludedChanges();
         String baseDir = project.getBasePath();
-        String prompt = buildPrompt(includedChanges, baseDir);
+        String prompt = buildPrompt(includedChanges, baseDir, project);
         new Thread(() -> createCommitMessage(prompt, commitPanel)).start();
     }
 
@@ -136,9 +140,12 @@ public class CreateCommitAction extends AnAction implements DumbAware {
         }
     }
 
-    private String buildPrompt(List<Change> includedChanges, String baseDir) {
+    private String buildPrompt(List<Change> includedChanges, String baseDir, Project project) {
         List<String> totalUnifiedDiffs = new ArrayList<>();
+        List<String> methodStackSummaryList = new ArrayList<>();
+        String prompt = new String(CommitByAISettingsState.getInstance().prompt);
         for (Change change : includedChanges) {
+            HashSet<PsiMethod> changedMethods = new HashSet<>();
             ContentRevision beforeRevision = change.getBeforeRevision();
             ContentRevision afterRevision = change.getAfterRevision();
             String beforeContent = "";
@@ -158,8 +165,42 @@ public class CreateCommitAction extends AnAction implements DumbAware {
             String relativePath = change.getVirtualFile().getPath().replace(baseDir, "");
             List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(relativePath, relativePath, original, patch, 3);
             totalUnifiedDiffs.addAll(unifiedDiff);
+            // for java file, we need to extract method call graph
+            if (prompt.contains("${MethodStackSummary}") && change.getVirtualFile().getName().endsWith(".java")) {
+                VirtualFile file = change.getVirtualFile();
+                if (file != null) {
+                    PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+                    if (psiFile != null) {
+                        psiFile.accept(new JavaRecursiveElementVisitor() {
+                            @Override
+                            public void visitMethod(PsiMethod method) {
+                                super.visitMethod(method);
+                                // You might want more refined change detection logic here
+                                changedMethods.add(method);
+                            }
+                        });
+                    }
+                }
+                JavaCodeContextExtractor callGraphBuilder = new JavaCodeContextExtractor();
+                for (PsiMethod method : changedMethods) {
+                    PsiFile psiFile = method.getContainingFile();
+                    callGraphBuilder.buildCallGraph(psiFile);
+                }
+                Map<PsiMethod, Set<PsiMethod>> callGraphMap = callGraphBuilder.getCallGraph();
+                // Step 3: Trace the call stack for each changed method
+                StringBuilder methodStackSummary = new StringBuilder("It's the method structure summary of file: " + relativePath + "\n");
+                for (PsiMethod changedMethod : changedMethods) {
+                    methodStackSummary.append(" - " + JavaCodeContextExtractor.printMethodSignature(changedMethod)).append("\n");
+                    for (PsiMethod method : callGraphMap.get(changedMethod)) {
+                        methodStackSummary.append("    - " + JavaCodeContextExtractor.printMethodSignature(method)).append("\n");
+                    }
+                }
+                methodStackSummaryList.add(methodStackSummary.toString());
+            }
         }
-        String prompt = new String(CommitByAISettingsState.getInstance().prompt);
+        if (prompt.contains("${MethodStackSummary}") && !methodStackSummaryList.isEmpty()) {
+            prompt = prompt.replace("${MethodStackSummary}", String.join("\n", methodStackSummaryList));
+        }
         prompt = prompt.replace("${UnifiedDiff}", String.join("\n", totalUnifiedDiffs));
         prompt = prompt.replace("${TotalFileCount}", String.valueOf(includedChanges.size()));
         return prompt;
