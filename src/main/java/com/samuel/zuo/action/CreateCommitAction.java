@@ -3,9 +3,8 @@ package com.samuel.zuo.action;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
-import com.google.gson.JsonElement;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -109,8 +108,8 @@ public class CreateCommitAction extends AnAction implements DumbAware {
                     responseBody = responseBody.trim();
                     if (responseBody.endsWith("}")) {
                         // parse response body to JsonObject
-                        JsonElement jsonElement = JsonParser.parseString(responseBody);
-                        JsonObject jsonObject = jsonElement.getAsJsonObject();
+                        Gson gson = new Gson();
+                        JsonObject jsonObject = gson.fromJson(responseBody, JsonObject.class);
                         String message = jsonObject.get("response").getAsString();
                         // 处理成功响应
                         System.out.print(message);
