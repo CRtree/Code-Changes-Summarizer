@@ -20,7 +20,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.github.java-diff-utils:java-diff-utils:4.12")
     intellijPlatform {
-        create("IC", "2024.1.1")
+        create("IC", "2024.3")
         bundledPlugin("com.intellij.java")
         instrumentationTools()
         pluginVerifier()
@@ -31,7 +31,7 @@ intellijPlatform {
     pluginConfiguration {
         ideaVersion {
             sinceBuild.set("222")
-            untilBuild.set("241.*")
+            untilBuild.set("243.*")
         }
     }
     signing {
