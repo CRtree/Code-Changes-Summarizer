@@ -1,30 +1,48 @@
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.9.0"
-    id("org.jetbrains.intellij") version "1.15.0"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
 }
 
 group = "com.samuel.zuo"
-version = "0.0.1"
+version = "0.1.1"
 
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
     // https://mvnrepository.com/artifact/org.pegdown/pegdown
     implementation("org.pegdown:pegdown:1.6.0")
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.github.java-diff-utils:java-diff-utils:4.12")
+    intellijPlatform {
+        create("IC", "2024.1.1")
+        bundledPlugin("com.intellij.java")
+        instrumentationTools()
+        pluginVerifier()
+    }
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2022.2.5")
-    type.set("IC") // Target IDE Platform
+intellijPlatform {
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild.set("222")
+            untilBuild.set("241.*")
+        }
+    }
+    signing {
+        certificateChainFile.set(file("Users/samuel_zuo/.ssh/chain.crt"))
+        privateKeyFile.set(file("Users/samuel_zuo/.ssh/private.pem"))
+        password.set("qazw")
+    }
 
-    plugins.set(listOf(/* Plugin Dependencies */))
+    publishing {
+        token.set(System.getenv("PUBLISH_TOKEN"))
+    }
 }
 
 tasks {
@@ -35,20 +53,5 @@ tasks {
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions.jvmTarget = "17"
-    }
-
-    patchPluginXml {
-        sinceBuild.set("222")
-        untilBuild.set("232.*")
-    }
-
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
-
-    publishPlugin {
-        token.set(System.getenv("PUBLISH_TOKEN"))
     }
 }
