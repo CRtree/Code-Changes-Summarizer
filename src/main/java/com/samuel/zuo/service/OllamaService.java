@@ -1,11 +1,10 @@
 package com.samuel.zuo.service;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.samuel.zuo.entity.OllamaModelList;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import com.samuel.zuo.setting.CommitByAISettingsState;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,7 +16,50 @@ import java.util.List;
  * author: samuel_zuo
  * version: 1.0
  */
-public class OllamaService {
+public class OllamaService implements ModelService {
+
+    @Override
+    public String getModelName() {
+        return "";
+    }
+
+    @Override
+    public String getRemoteAPIUrl() {
+        return "http://localhost:11434/api/generate";
+    }
+
+    @Override
+    public String getRemoteAPIToken() {
+        return "";
+    }
+
+    @Override
+    public Request buildRequest(String prompt) {
+        JsonObject bodyJson = new JsonObject();
+        String model = CommitByAISettingsState.getInstance().model;
+        bodyJson.addProperty("model", model);
+        bodyJson.addProperty("prompt", prompt);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), bodyJson.toString());
+        return new Request.Builder()
+                .url( getRemoteAPIUrl())
+                .post(requestBody)
+                .build();
+    }
+
+    @Override
+    public String parseResponse(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        text = text.trim();
+        if (text.endsWith("}")) {
+            // parse response body to JsonObject
+            Gson gson = new Gson();
+            JsonObject jsonObject = gson.fromJson(text, JsonObject.class);
+            return jsonObject.get("response").getAsString();
+        }
+        return "";
+    }
 
     public List<String> listLocalModels() {
         // Create an OkHttpClient instance

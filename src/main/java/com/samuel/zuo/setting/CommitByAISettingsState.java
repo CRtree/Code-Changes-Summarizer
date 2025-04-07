@@ -29,7 +29,11 @@ public class CommitByAISettingsState implements PersistentStateComponent<CommitB
             - Description of change #2 (max. 72 characters per line, no period at the end)
             - ... and so on for as many changes as necessary
             """;
-    private String aiServerAddress = "";
+    public String aiServerAddress = "";
+
+    public String token = "";
+
+    public String type = "local";// 1. local(ollama), 2. remote(API)
 
     public String model = "mistral";
 

@@ -3,8 +3,6 @@ package com.samuel.zuo.action;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -25,14 +23,20 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.vcs.commit.AbstractCommitWorkflowHandler;
+import com.samuel.zuo.factory.ModelServiceFactory;
 import com.samuel.zuo.service.JavaCodeContextExtractor;
+import com.samuel.zuo.service.ModelService;
 import com.samuel.zuo.setting.CommitByAISettingsState;
 import icons.MyIcons;
-import okhttp3.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -64,8 +68,28 @@ public class CreateCommitAction extends AnAction implements DumbAware {
         }
         List<Change> includedChanges = abstractCommitWorkflowHandler.getUi().getIncludedChanges();
         String baseDir = project.getBasePath();
+        if(!checkConfiguration()) {
+            aiProcessing = false;
+            return;
+        }
         String prompt = buildPrompt(includedChanges, baseDir, project);
         new Thread(() -> createCommitMessage(prompt, commitPanel)).start();
+    }
+
+    private boolean checkConfiguration() {
+        CommitByAISettingsState settingsState = CommitByAISettingsState.getInstance();
+        if (settingsState.type.equals("remote")) {
+            if (StringUtils.isEmpty(settingsState.aiServerAddress) || StringUtils.isEmpty(settingsState.token)) {
+                System.out.println("Error: Please add remote API or token in your plugin config page.");
+                Notification notification = new Notification("Summarize Code Changes",
+                        "Summarize changes failed",
+                        "Please add remote API or token in your plugin config page.", NotificationType.WARNING);
+                notification.addAction(new MyNotificationAction("Summarize code changes"));
+                Notifications.Bus.notify(notification);
+                return false;
+            }
+        }
+        return true;
     }
 
     private void createCommitMessage(String prompt, CommitMessageI commitPanel) {
@@ -74,44 +98,20 @@ public class CreateCommitAction extends AnAction implements DumbAware {
                 .readTimeout(60, TimeUnit.SECONDS) // 设置读取超时时间为30秒
                 .build();
         // 请求体数据
-        JsonObject bodyJson = new JsonObject();
         String model = CommitByAISettingsState.getInstance().model;
-        bodyJson.addProperty("model", model);
-        bodyJson.addProperty("prompt", prompt);
-//        JsonObject options = new JsonObject();
-//        options.addProperty("temperature", 0.8);
-//        bodyJson.add("options", options);
+        ModelService modelService = ModelServiceFactory.getModelService(model);
         // 创建请求体
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), bodyJson.toString());
-        // 创建请求
-        Request request = new Request.Builder()
-                .url("http://localhost:11434/api/generate")
-                .post(requestBody)
-                .build();
+        Request request = modelService.buildRequest(prompt);
         StringBuilder sb = new StringBuilder();
         // 发起请求并处理响应
         boolean apiSuccess = false;
         try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                ResponseBody body = response.body();
-                if (body == null) {
-                    return;
-                }
-                InputStream inputStream = body.byteStream();
-                int read = 0;
-                byte[] buffer = new byte[4096];
-                while ((read = inputStream.read(buffer)) != -1) {
-                    String responseBody = new String(buffer, 0, read);
-                    if (responseBody.isEmpty()) {
-                        continue;
-                    }
-                    responseBody = responseBody.trim();
-                    if (responseBody.endsWith("}")) {
-                        // parse response body to JsonObject
-                        Gson gson = new Gson();
-                        JsonObject jsonObject = gson.fromJson(responseBody, JsonObject.class);
-                        String message = jsonObject.get("response").getAsString();
-                        // 处理成功响应
+            if (response.isSuccessful() && response.body() != null) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body().byteStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        // Process the JSON data
+                        String message = modelService.parseResponse(line);
                         System.out.print(message);
                         sb.append(message);
                         String freshMessage = sb.toString();
@@ -134,7 +134,7 @@ public class CreateCommitAction extends AnAction implements DumbAware {
             if (!apiSuccess) {
                 Notifications.Bus.notify(new Notification("Summarize Code Changes",
                         "Summarize changes failed",
-                        "Please check if Ollama is running well on your local machine.", NotificationType.ERROR));
+                        "Please check if AI service is running well by selected configuration.", NotificationType.ERROR));
             }
         }
     }

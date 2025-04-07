@@ -32,7 +32,10 @@ public class CommitByAIConfigurable implements Configurable {
     public boolean isModified() {
         CommitByAISettingsState settingsState = CommitByAISettingsState.getInstance();
         return !commitByAISettingsComponent.getPrompt().equals(settingsState.prompt) ||
-                !commitByAISettingsComponent.getModel().equals(settingsState.model);
+                !commitByAISettingsComponent.getModel().equals(settingsState.model) ||
+                !commitByAISettingsComponent.getAiServerAddress().equals(settingsState.aiServerAddress) ||
+                !commitByAISettingsComponent.getToken().equals(settingsState.token) ||
+                !commitByAISettingsComponent.getType().equals(settingsState.type);
     }
 
     @Override
@@ -40,13 +43,18 @@ public class CommitByAIConfigurable implements Configurable {
         CommitByAISettingsState settingsState = CommitByAISettingsState.getInstance();
         settingsState.prompt = commitByAISettingsComponent.getPrompt();
         settingsState.model = commitByAISettingsComponent.getModel();
+        settingsState.type = commitByAISettingsComponent.getType();
+        settingsState.aiServerAddress = commitByAISettingsComponent.getAiServerAddress();
+        settingsState.token = commitByAISettingsComponent.getToken();
     }
 
     @Override
     public void reset() {
         commitByAISettingsComponent.setPrompt(CommitByAISettingsState.getInstance().prompt);
         commitByAISettingsComponent.setModel(CommitByAISettingsState.getInstance().model);
-        //settingsForm.setAiServerAddress(settingsState.aiServerAddress);
+        commitByAISettingsComponent.setAiServerAddress(CommitByAISettingsState.getInstance().aiServerAddress);
+        commitByAISettingsComponent.setToken(CommitByAISettingsState.getInstance().token);
+        commitByAISettingsComponent.setType(CommitByAISettingsState.getInstance().type);
     }
 
     @Override

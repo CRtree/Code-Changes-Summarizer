@@ -22,13 +22,12 @@
 
     <change-notes><![CDATA[
         <ul>
-          <li>bugfix</li>
+          <li>support deepseek-chat model(API)</li>
         </ul>
 ]]></change-notes>
 
     <!-- Product and plugin compatibility requirements.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-    <depends>com.intellij.modules.platform</depends>
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->=
     <depends>com.intellij.java</depends>
 
     <!-- Extension points defined by the plugin.
